@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ScamWatch</title>
+<style>
+:root {
+  --site-primary: #153f39;
+  --site-on-primary: #ffffff;
+  --site-secondary: #d9eee7;
+  --site-on-secondary: #163b34;
+  --site-background: #eef4f1;
+  --site-on-background: #172b27;
+  --site-font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-font-heading: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --site-heading-scale: 1;
+  --site-spacing-scale: 1;
+  --site-radius-scale: 1;
+  --site-decoration-opacity: 1;
+  color-scheme: light dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--site-font-body); background: var(--site-background); color: var(--site-on-background); }
+#app { min-height: 100vh; width: 100%; border-radius: 0; background-color: var(--site-background); color: var(--site-on-background); }
+header { background: var(--site-primary); color: var(--site-on-primary); padding: calc(22px * var(--site-spacing-scale)) max(22px, calc((100vw - 1180px)/2)); }
+.topline { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+.brand { display:flex; align-items:center; gap:12px; font-weight:800; letter-spacing:-.04em; font-size: calc(23px * var(--site-heading-scale)); }
+.logo { width:38px; height:38px; border-radius:12px; display:grid; place-items:center; background:rgba(255,255,255,.14); font-size:20px; }
+.pill { border:1px solid rgba(255,255,255,.25); border-radius:999px; padding:7px 11px; color:#d8f5e9; font-size:12px; font-weight:700; }
+.hero { max-width:1180px; margin:0 auto; padding:38px 22px 34px; display:grid; grid-template-columns:1.4fr .8fr; gap:28px; align-items:center; }
+.eyebrow { text-transform:uppercase; letter-spacing:.13em; font-size:11px; font-weight:800; color:#a8d8c7; }
+h1 { font-size:clamp(30px,4vw,48px); line-height:1.06; letter-spacing:-.05em; margin:10px 0 13px; }
+.hero p { color:#d5e7e1; line-height:1.65; max-width:650px; margin:0; }
+.hero-card { background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:calc(18px * var(--site-radius-scale)); padding:20px; }
+.hero-card strong { display:block; font-size:13px; margin-bottom:7px; }
+.hero-card span { color:#d5e7e1; font-size:13px; line-height:1.5; }
+nav { max-width:1180px; margin:0 auto; padding:0 22px; display:flex; gap:8px; overflow:auto; }
+nav button { border:0; background:transparent; color:#d5e7e1; padding:12px 15px; font-weight:700; border-bottom:3px solid transparent; cursor:pointer; white-space:nowrap; }
+nav button.active { color:white; border-color:#8ce0bd; }
+main { max-width:1180px; margin:0 auto; padding:28px 22px 60px; }
+.section-head { display:flex; align-items:end; justify-content:space-between; gap:16px; margin-bottom:18px; }
+h2 { font-size:calc(22px * var(--site-heading-scale)); letter-spacing:-.035em; margin:0 0 5px; }
+.sub { color:light-dark(#62756f,#a8b8b2); font-size:13px; line-height:1.5; }
+.grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+.card { background:light-dark(#ffffff,#1b2b27); border:1px solid light-dark(#dce7e2,#34443f); border-radius:calc(16px * var(--site-radius-scale)); padding:20px; box-shadow:0 8px 24px rgba(15,45,36,.045); }
+.card h3 { margin:0 0 6px; font-size:16px; letter-spacing:-.02em; }
+.card p { margin:0 0 15px; color:light-dark(#63746e,#a8b8b2); font-size:13px; line-height:1.5; }
+label { display:block; font-size:12px; font-weight:750; margin:12px 0 7px; }
+input, textarea, select { width:100%; border:1px solid light-dark(#cbd9d3,#465a52); background:light-dark(#fbfdfc,#14221e); color:light-dark(#172b27,#e8f2ee); border-radius:10px; padding:12px 13px; font:inherit; font-size:13px; outline:none; }
+input:focus, textarea:focus, select:focus { border-color:#398b70; box-shadow:0 0 0 3px rgba(57,139,112,.14); }
+textarea { resize:vertical; min-height:110px; }
+button.primary { border:0; border-radius:10px; background:var(--site-primary); color:var(--site-on-primary); padding:11px 15px; font-weight:750; cursor:pointer; margin-top:12px; }
+button.secondary { border:1px solid light-dark(#cbd9d3,#465a52); background:transparent; color:inherit; border-radius:10px; padding:10px 13px; font-weight:700; cursor:pointer; }
+button:disabled { opacity:.5; cursor:not-allowed; }
+.result { display:none; margin-top:14px; padding:13px; border-radius:10px; font-size:13px; line-height:1.55; }
+.result.show { display:block; }
+.result.good { background:light-dark(#e5f5ed,#173b2d); color:light-dark(#18573a,#b8f0d0); }
+.result.warn { background:light-dark(#fff2dc,#49351b); color:light-dark(#79500c,#ffdc9c); }
+.result.neutral { background:light-dark(#e9f0ee,#253833); color:light-dark(#3e5950,#d0e0d9); }
+.note { border-left:3px solid #68b697; padding:10px 12px; background:light-dark(#f1f7f4,#20332d); color:light-dark(#536860,#bdcdc6); border-radius:0 9px 9px 0; font-size:12px; line-height:1.5; margin-top:14px; }
+.metrics { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px; }
+.metric { background:var(--site-secondary); color:var(--site-on-secondary); padding:14px; border-radius:12px; }
+.metric b { display:block; font-size:23px; letter-spacing:-.04em; }
+.metric span { font-size:11px; font-weight:700; opacity:.8; }
+.full { grid-column:1/-1; }
+.table-wrap { overflow:auto; }
+table { width:100%; border-collapse:collapse; font-size:12px; min-width:540px; }
+th,td { padding:12px 10px; text-align:left; border-bottom:1px solid light-dark(#e1eae5,#34443f); vertical-align:top; }
+th { color:light-dark(#65776f,#aabbb3); font-size:10px; text-transform:uppercase; letter-spacing:.08em; }
+.empty { text-align:center; padding:26px; color:light-dark(#75867f,#aabbb3); }
+.tag { display:inline-block; padding:4px 8px; border-radius:99px; background:light-dark(#fff0d5,#49351b); color:light-dark(#79500c,#ffdc9c); font-size:10px; font-weight:800; }
+.hidden { display:none !important; }
+footer { border-top:1px solid light-dark(#dce7e2,#34443f); padding:20px 22px; color:light-dark(#71817a,#aabbb3); font-size:11px; text-align:center; }
+@media(max-width:760px) { .hero {grid-template-columns:1fr; padding-top:28px;} .hero-card {display:none;} .grid {grid-template-columns:1fr;} .metrics {grid-template-columns:repeat(3,1fr);} main {padding-top:22px;} }
+@media(prefers-color-scheme:dark) { :root { --site-primary:#153f39; --site-secondary:#244b40; --site-background:#101b18; --site-on-background:#e5efea; --site-on-secondary:#e4f3ec; } }
+</style>
+</head>
+<body>
+<div id="app">
+<header>
+  <div class="topline">
+    <div class="brand"><div class="logo">🛡</div>ScamWatch</div>
+    <div class="pill">PERSONAL SAFETY TOOLKIT</div>
+  </div>
+  <div class="hero">
+    <div><div class="eyebrow">Pause · Check · Protect</div><h1>Spot the warning signs<br>before you click.</h1><p>A simple workspace for checking suspicious links and messages, recording evidence, and understanding public IP information. It does not hack, trace, or secretly identify people.</p></div>
+    <div class="hero-card"><strong>Stay safe while investigating</strong><span>Never open a suspicious link just to test it. Don't confront suspected scammers, share passwords, or publish anyone's personal information.</span></div>
+  </div>
+  <nav aria-label="Main navigation">
+    <button class="active" data-tab="dashboard">Overview</button>
+    <button data-tab="links">Link checker</button>
+    <button data-tab="messages">Message analyzer</button>
+    <button data-tab="evidence">Evidence log</button>
+    <button data-tab="ip">IP information</button>
+  </nav>
+</header>
+<main>
+<section id="dashboard" class="panel">
+  <div class="section-head"><div><h2>Your safety dashboard</h2><div class="sub">A local workspace. Entries stay in this browser on this device.</div></div><span class="tag">DEMO PROTOTYPE</span></div>
+  <div class="metrics">
+    <div class="metric"><b id="countEvidence">0</b><span>Evidence entries</span></div>
+    <div class="metric"><b id="countChecks">0</b><span>Checks performed</span></div>
+    <div class="metric"><b>4</b><span>Safety tools</span></div>
+  </div>
+  <div class="grid">
+    <div class="card"><h3>🔗 Check a suspicious link</h3><p>Review a URL for common warning signs without visiting it.</p><button class="primary" data-go="links">Open link checker</button></div>
+    <div class="card"><h3>💬 Analyze a message</h3><p>Look for urgency, payment pressure, impersonation, and other scam tactics.</p><button class="primary" data-go="messages">Analyze a message</button></div>
+    <div class="card"><h3>🗂 Save evidence</h3><p>Record usernames, dates, platform names, and a short factual summary.</p><button class="primary" data-go="evidence">Open evidence log</button></div>
+    <div class="card"><h3>🌐 Understand an IP address</h3><p>Learn what an IP can and cannot reveal, with no covert tracking.</p><button class="primary" data-go="ip">IP information</button></div>
+  </div>
+  <div class="note">Important: this prototype uses browser-side pattern checks, not a live threat-intelligence service. A result marked “no obvious warning signs” does not prove a link or message is safe.</div>
+</section>
+<section id="links" class="panel hidden">
+  <div class="section-head"><div><h2>Suspicious link checker</h2><div class="sub">Paste the URL as text. The checker does not open it or contact the website.</div></div></div>
+  <div class="card">
+    <label for="urlInput">URL to inspect</label><input id="urlInput" type="text" placeholder="https://example.com/login">
+    <button class="primary" id="checkUrl">Check this URL</button>
+    <div id="urlResult" class="result" aria-live="polite"></div>
+    <div class="note">Checks include lookalike domain clues, IP-address hosts, unusual URL characters, insecure HTTP, and suspicious wording. These are clues, not a definitive verdict.</div>
+  </div>
+</section>
+<section id="messages" class="panel hidden">
+  <div class="section-head"><div><h2>Scam message analyzer</h2><div class="sub">Paste a suspicious DM, email, or text message. Remove private details first.</div></div></div>
+  <div class="card">
+    <label for="messageInput">Message text</label><textarea id="messageInput" placeholder="Paste the message here..."></textarea>
+    <button class="primary" id="analyzeMessage">Analyze message</button>
+    <div id="messageResult" class="result" aria-live="polite"></div>
+    <div class="note">Your text is analyzed in this page only. Avoid pasting passwords, bank details, verification codes, or other sensitive information.</div>
+  </div>
+</section>
+<section id="evidence" class="panel hidden">
+  <div class="section-head"><div><h2>Evidence log</h2><div class="sub">Keep factual notes for reporting to the platform or relevant authorities.</div></div><button class="secondary" id="exportEvidence">Export CSV</button></div>
+  <div class="grid">
+    <div class="card">
+      <h3>New evidence entry</h3>
+      <label for="evPlatform">Platform / website</label><input id="evPlatform" placeholder="e.g. Instagram, WhatsApp">
+      <label for="evUser">Username or account name</label><input id="evUser" placeholder="Public-facing username">
+      <label for="evDate">Date observed</label><input id="evDate" type="date">
+      <label for="evType">Type of activity</label><select id="evType"><option>Suspicious message</option><option>Impersonation</option><option>Payment request</option><option>Suspicious link</option><option>Other</option></select>
+      <label for="evNotes">What happened? (facts only)</label><textarea id="evNotes" placeholder="Describe what you saw, what was requested, and any action you took."></textarea>
+      <button class="primary" id="saveEvidence">Save evidence entry</button>
+      <div id="evidenceResult" class="result" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <h3>Saved records</h3><p>Stored locally in this browser using local storage. Export a copy if you need to keep it elsewhere.</p>
+      <div class="table-wrap"><table><thead><tr><th>Date</th><th>Platform / account</th><th>Type</th><th>Notes</th></tr></thead><tbody id="evidenceRows"><tr><td colspan="4" class="empty">No evidence entries yet.</td></tr></tbody></table></div>
+      <button class="secondary" id="clearEvidence">Clear all local entries</button>
+    </div>
+  </div>
+</section>
+<section id="ip" class="panel hidden">
+  <div class="section-head"><div><h2>IP information checker</h2><div class="sub">Understand an IP address without trying to identify or locate a person.</div></div></div>
+  <div class="grid">
+    <div class="card">
+      <h3>Check IP format and address type</h3>
+      <label for="ipInput">IP address</label><input id="ipInput" placeholder="e.g. 8.8.8.8">
+      <button class="primary" id="checkIp">Check address</button>
+      <div id="ipResult" class="result" aria-live="polite"></div>
+    </div>
+    <div class="card">
+      <h3>What an IP address can tell you</h3>
+      <p>An IP address may indicate a network or internet provider and a broad approximate region. It usually cannot identify a person's exact home address or prove who sent a message.</p>
+      <p>Addresses can be shared, dynamic, masked by VPNs, or belong to mobile carriers, businesses, and public networks.</p>
+      <div class="note">ScamWatch does not collect visitors' IP addresses, create tracking links, run port scans, or attempt to access devices. Use platform reporting tools and preserve messages instead.</div>
+    </div>
+  </div>
+</section>
+</main>
+<footer>ScamWatch prototype · Checks are educational indicators, not legal advice or a guarantee of safety.</footer>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+let checks = 0;
+const getEntries = () => { try { return JSON.parse(localStorage.getItem('scamwatch_entries') || '[]'); } catch { return []; } };
+const setEntries = rows => localStorage.setItem('scamwatch_entries', JSON.stringify(rows));
+function showResult(id, kind, html) { const el=$(id); el.className='result show '+kind; el.innerHTML=html; }
+function go(tab) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('hidden',p.id!==tab));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.tab)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.go)));
+function updateMetrics() { $('countEvidence').textContent=getEntries().length; $('countChecks').textContent=checks; }
+function esc(s) { return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+$('checkUrl').addEventListener('click',()=>{
+  const raw=$('urlInput').value.trim(); checks++; updateMetrics();
+  if(!raw) return showResult('urlResult','neutral','Enter a URL first.');
+  let u;
+  try { u=new URL(raw.includes('://')?raw:'https://'+raw); }
+  catch { return showResult('urlResult','warn','<b>Could not parse this URL.</b> Check for typos. Do not open it to test it.'); }
+  const host=u.hostname.toLowerCase(), flags=[];
+  if(u.protocol!=='https:') flags.push('It does not use HTTPS.');
+  if(/^\\d{1,3}(\\.\\d{1,3}){3}$/.test(host)) flags.push('The host is an IP address rather than a familiar domain name.');
+  if(host.includes('xn--')) flags.push('The domain uses encoded characters that can sometimes disguise lookalike names.');
+  if(host.split('.').length>4) flags.push('The hostname has an unusually large number of subdomains.');
+  if(host.includes('-') && /(bank|paypal|apple|google|microsoft|amazon)/.test(host)) flags.push('A brand-like word appears in a hyphenated hostname; verify the exact official domain independently.');
+  if(/login|verify|secure|account|wallet|gift|claim|prize|bonus|update|support/.test(u.href.toLowerCase())) flags.push('The URL contains words often used in account, prize, or verification lures.');
+  if(u.username || u.password) flags.push('The URL contains embedded login information before the hostname.');
+  if(/[\\u0000-\\u0020]/.test(raw)) flags.push('The URL contains whitespace or control characters.');
+  const unique=[...new Set(flags)];
+  showResult('urlResult',unique.length?'warn':'neutral',`<b>${unique.length?'Warning signs found':'No obvious warning signs found'}</b><br>Hostname: <b>${esc(host)}</b><br>${unique.length?'<ul>'+unique.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'This basic check did not detect the listed patterns.'}<br><b>Next step:</b> Do not sign in or pay through an unexpected link. Visit the organization using its official app or a web address you type yourself.`);
+});
+const patterns=[
+  ['Urgency or threats',/act now|immediately|within 24 hours|urgent|final warning|account.*(suspend|close|lock)|arrest|police/i],
+  ['Requests for money or gift cards',/gift card|crypto(currency)?|bitcoin|wire transfer|send money|processing fee|pay.*(fee|tax|charge)/i],
+  ['Requests for passwords or codes',/password|one.time code|verification code|otp|pin number|login details|recovery code/i],
+  ['Prize or giveaway bait',/you have won|winner|claim your prize|free (iphone|phone|money)|giveaway/i],
+  ['Impersonation or secrecy',/pretend|impersonat|boss|manager|relative|family member|don't tell anyone|keep this secret/i],
+  ['Off-platform pressure',/whatsapp me|telegram me|move.*(chat|conversation)|click.*link|download.*app/i]
+];
+$('analyzeMessage').addEventListener('click',()=>{
+  const msg=$('messageInput').value.trim(); checks++; updateMetrics();
+  if(!msg) return showResult('messageResult','neutral','Paste a message first.');
+  const hits=patterns.filter(p=>p[1].test(msg)).map(p=>p[0]);
+  showResult('messageResult',hits.length?'warn':'neutral',`<b>${hits.length?hits.length+' potential warning pattern(s)':'No listed warning patterns detected'}</b>${hits.length?'<ul>'+hits.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'<p>This does not prove the message is genuine.</p>'}<b>Safer next steps:</b><ul><li>Verify the sender using a separate, trusted contact method.</li><li>Never share passwords, one-time codes, or banking details.</li><li>Do not pay unexpected fees or open attachments from unknown senders.</li></ul>`);
+});
+function renderEntries() {
+  const rows=getEntries(); $('countEvidence').textContent=rows.length;
+  $('evidenceRows').innerHTML=rows.length?rows.map(r=>`<tr><td>${esc(r.date)}</td><td>${esc(r.platform)}<br><span class="sub">${esc(r.user)}</span></td><td>${esc(r.type)}</td><td>${esc(r.notes)}</td></tr>`).join(''):'<tr><td colspan="4" class="empty">No evidence entries yet.</td></tr>';
+}
+$('saveEvidence').addEventListener('click',()=>{
+  const platform=$('evPlatform').value.trim(), notes=$('evNotes').value.trim();
+  if(!platform||!notes) return showResult('evidenceResult','warn','Please enter at least the platform and a factual description.');
+  const rows=getEntries(); rows.unshift({date:$('evDate').value||new Date().toISOString().slice(0,10),platform,user:$('evUser').value.trim(),type:$('evType').value,notes});
+  setEntries(rows); $('evPlatform').value=''; $('evUser').value=''; $('evNotes').value=''; renderEntries();
+  showResult('evidenceResult','good','Evidence entry saved in this browser.');
+});
+$('clearEvidence').addEventListener('click',()=>{ if(confirm('Delete all ScamWatch evidence entries stored in this browser?')) { setEntries([]); renderEntries(); }});
+$('exportEvidence').addEventListener('click',()=>{
+  const rows=getEntries(); if(!rows.length) return alert('There are no entries to export.');
+  const cols=['date','platform','user','type','notes'];
+  const csv=[cols.join(','),...rows.map(r=>cols.map(k=>'"'+String(r[k]||'').replace(/"/g,'""')+'"').join(','))].join('\\r\\n');
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'}), a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download='scamwatch-evidence.csv'; a.click(); URL.revokeObjectURL(a.href);
+});
+function ipv4Type(ip) {
+  const p=ip.split('.').map(Number);
+  if(p.length!==4||p.some((n,i)=>!/^\\d{1,3}$/.test(ip.split('.')[i])||n>255)) return null;
+  if(p[0]===10 || p[0]===127 || (p[0]===192&&p[1]===168) || (p[0]===172&&p[1]>=16&&p[1]<=31) || (p[0]===169&&p[1]===254)) return 'Private, loopback, or link-local address';
+  if(p[0]===0 || p[0]>=224) return 'Reserved or multicast range';
+  return 'Public IPv4 format';
+}
+$('checkIp').addEventListener('click',()=>{
+  const ip=$('ipInput').value.trim(); checks++; updateMetrics();
+  const type=ipv4Type(ip);
+  const ipv6=/^[0-9a-fA-F:]+$/.test(ip)&&ip.includes(':')&&ip.length<=45;
+  if(!type&&!ipv6) return showResult('ipResult','warn','This does not look like a valid basic IPv4 or IPv6 address.');
+  showResult('ipResult','neutral',`<b>Format:</b> ${type||'Possible IPv6 address'}<br>This check only classifies the address format. It does not identify a person, reveal a precise location, or establish who used the address.`);
+});
+renderEntries(); updateMetrics();
+</script>
+</body>
+</html>
